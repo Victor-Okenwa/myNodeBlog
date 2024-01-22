@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%- include('./includes/header.ejs') %>
+</head>
+
+<body class="index-page">
+    <%- include('./includes/navbar.ejs') %>
+
+    <main class="my-3">
+        <%  if(posts) { %>
+        <div class="blog-container container-fluid mt-5">
+            <div class="head d-flex justify-content-between">
+                <h2>Blogs</h2>
+                <form>
+                    <button type="button" onclick="addFilterOptions(this)" class="btn border" title="Select a category "><i class="fa fa-filter"></i> <span
+                            class="selected">All</span></button>
+                    <div class="filter d-none">
+                        <span value="all" class="selected" onclick="chooseFilter(this)">All</span>
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="blogs container">
+                <% posts.forEach(post => { %>
+                <div class="blog">
+                    <div class="floater"></div>
+
+                    <div class="blog-image">
+                        <img src="/thumbnails/<%= post.thumbnail %>" alt="">
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-header">
+                            <%= post.title %>
+                        </div>
+                        <div class="blog-body">
+                            <%= post.content %>
+                        </div>
+
+                        <div class="blog-info">
+                            <span><i class="fa fa-user"></i> <span><%= post.poster %></span> </span>
+                            <span><i class="fa fa-heart"></i> <span><%= post.likes %></span> </span>
+                            <span><i class="fa fa-eye"></i> <span><%= post.views %></span> </span>
+                            <span><i class="fa fa-calendar-alt"></i> <span><%= post.postedOn %></span> </span>
+                        </div>
+                        <div class="blog-btn"><a href="post/<%= post.id %>" class="btn bg-norm text-light">Read more <i
+                                    class="fa fa-long-arrow-alt-right"></i></a></div>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+        <%} else { %>
+        <h3 class="text-center d-block my-5">No blog found</h3>
+        <% } %>
+
+    </main>
+
+    <%- include('./includes/footer.ejs') %>
+    <script src="/js/main.js"></script>
+</body>
+
+</html>

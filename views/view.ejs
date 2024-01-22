@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%- include('./includes/header.ejs') %>
+</head>
+
+<body class="view-page">
+    <%- include('./includes/navbar.ejs') %>
+
+    <main class="my-3">
+        <% if (post) { %>
+        <div class="blog container card">
+            <img class="card-img card-img-top" src="/thumbnails/<%= post.thumbnail %>" alt="">
+            <div class="card-title">
+                <h4 class="title">
+                    <%= post.title %>.
+                </h4>
+                <div class="blog-info">
+                    <span class="info"><i class="fa fa-user"></i> <span>
+                            <%= post.poster %>
+                        </span> </span>
+                    <span class="info"><i class="fa fa-heart"></i> <span>
+                            <%= post.likes %>
+                        </span> </span>
+                    <span class="info"><i class="fa fa-eye"></i> <span>
+                            <%= post.views %>
+                        </span> </span>
+                    <span class="info"><i class="fa fa-calendar-alt"></i> <span>
+                            <%= post.postedOn %>
+                        </span> </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <%= post.content %>
+            </div>
+
+            <div class="card-footer">
+                <div class="options-box mb-3">
+                    <form id="likeForm" class="like" enctype="application/x-www-form-urlencoded">
+                        <input type="text" value="<%= post.id %>" hidden name="postId">
+                        <button id="liker" class="btn <%= post.likedBy ? 'active' : '' %>"><i class="fa fa-heart"></i>
+                            <span id="likeCount">
+                                <%= post.likes %>
+                            </span></button>
+                    </form>
+                    <div class="share">
+                        <button type="button" class="btn"><i class="fa fa-paper-plane"></i></button>
+                    </div>
+                    <div class="report">
+                        <a href="report" class="btn">Report post</a>
+                    </div>
+                </div>
+                <div class="comment-box mb-3">
+                    <form id="commentForm" class="d-flex flex-column">
+                        <input type="text" name="postId" value="<%= post.id %>" hidden>
+                        <textarea name="comment" id="comment" class="form-control form-control-plaintext mb-2 px-2"
+                            style="resize: none; border: 1px solid #cccccc63"
+                            placeholder="What's on your mind?"></textarea>
+                        <div>
+                            <button type="button" class="btn bg-norm text-black-50" onclick="postComment(this)">Comment</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="commentsContainer mt-5">
+                    <h3> <b id="commentCount"><%= post.commentsCount %></b> Comments</h3>
+                    <% if (comments) { %>
+
+
+                    <div class="comments">
+                        <% comments.forEach(comment => { %>
+                        <div class="comment">
+                            <div class="comment-head">
+                                <a href="/profile/<%= comment.commenterId %>" class="profile">
+                                    <img src="/profiles/<%= comment.commenterProfile %>" alt="">
+                                    <span
+                                        class="commenter text-uppercase font-weight-bold"><%= comment.commenterName %></span>
+                                </a>
+                                <span class="posted-on font-italic font-weight-lighter"><%= comment.postedOn %></span>
+                                <% if (comment.isCurrentUser) { %>
+                                <div class="drop">
+                                    <button class="user-info btn drop-btn overflow-auto">
+                                        <i class="fa fa-comment-dots"> </i>
+                                    </button>
+                                    <div class="drop-menu">
+                                        <a class="btn" onclick="prepareEdit(this)" data-type="comment" data-id="<%= comment.id %>" data-value="<%= comment.comment %>" data-toggle="modal" data-target="#editModal">edit</a>
+                                        <form>
+                                            <input type="text" value="comment" name="type" hidden>
+                                            <input type="text" value="<%= comment.id %>" name="commentID" hidden>
+                                            <button type="button" onclick="deleteComment(this)">delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <% } %>
+                            </div>
+                            <div class="comment-body">
+                                <div class="comment-text" id="<%= comment.id %>"><%= comment.comment %></div>
+                                <div class="options">
+                                    <button class="btn toggleReply" onclick="toggle2ndElement(this)"
+                                        id="<%= comment.commenterId %>"><i class="fa fa-reply"></i>
+                                    </button>
+                                    <form class="likeForm">
+                                        <input type="text" value="comment" name="type" hidden>
+                                        <input type="text" value="<%= post.id %>" name="postID" hidden>
+                                        <input type="text" value="<%= comment.id %>" name="commentID" hidden>
+                                        <button class="btn liker <%= comment.likedBy ? 'active' : '' %>" onclick="commentLike(this)"> <i class="fa fa-heart"></i> <span
+                                                class="likeNumb"><%= comment.likes %></span></button>
+                                    </form>
+                                </div>
+                                <form class="mb-3 toggleThis replyForm d-none">
+                                    <input type="text" value="<%= post.id %>" name="postID" hidden>
+                                    <input type="text" value="<%= comment.id %>" name="commentID" hidden>
+                                    <input type="text" value="" name="replyTo" hidden>
+                                    <textarea name="reply"
+                                        class="form-control form-control-plaintext mb-2 px-2 border border-1"></textarea>
+                                    <button type="button" onclick="postReply(this)" class="btn bg-norm text-light">Reply</button>
+                                </form>
+                                <% if (comment.commentReplies) { %>
+                                    <div class="reply-box">
+                                        <button class="btn" onclick="toggle1stElement(this)">Replies <span
+                                                class="repliesNumb"><%= comment.replies %></span></button>
+                                        <div class="replies border-left pl-2 ml-3 d-none toggleThis">
+                                            <% comment.commentReplies.forEach(reply => { %>
+                                                <div class="reply">
+                                                    <div class="reply-head">
+                                                        <div class="repliers">
+                                                            <a href="/profile/<%= reply.replierId %>" class="profile">
+                                                                <img src="/profiles/<%= reply.replierProfile %>" alt="">
+                                                                <div>
+                                                                    <span
+                                                                        class="replier text-uppercase font-weight-bold"><%= reply.replierName %></span>
+                                                                </div>
+                                                            </a>
+                                                            <a href="/profile/<%= reply.repliedTo._id %>" class="reply-to text-secondary text-uppercase font-weight-bold">
+                                                                <%=  reply.repliedTo.username%>
+                                                            </a>
+                                                        </div>
+                                                        <span class="posted-on font-italic font-weight-lighter"><%= reply.postedOn %></span>
+                                                        <% if (reply.isCurrentUser) { %>
+                                                            <div class="drop">
+                                                                <button class="user-info btn drop-btn overflow-auto">
+                                                                    <i class="fa fa-comment-dots"> </i>
+                                                                </button>
+            
+                                                                <div class="drop-menu">
+                                                                    <a class="btn" onclick="prepareEdit(this)" data-type="reply" data-id="<%= reply.id %>" data-value="<%= reply.reply %>" data-toggle="modal" data-target="#editModal">edit</a>
+                                                                    <form>
+                                                                        <input type="text" value="reply" name="type" hidden>
+                                                                        <input type="text" value="<%= reply.id %>" name="commentID" hidden>
+                                                                        <button type="button" onclick="deleteComment(this)">delete</button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="reply-body">
+                                                        <div class="reply-text" id="<%= reply.id %>"><%= reply.reply %></div>
+                                                        <div class="options">
+                                                            <button id="<%= reply.replierId %>" class="btn toggleReply" onclick="toggle2ndElement(this)"><i
+                                                                    class="fa fa-reply"></i></button>
+                                                            <form class="likeForm">
+                                                                <input type="text" value="reply" name="type" hidden>
+                                                                <input type="text" value="<%= post.id %>" name="postID"hidden >
+                                                                <input type="text" value="<%= reply.id %>" name="commentID" hidden>
+                                                                <button class="btn liker <%= reply.likedBy ? 'active' : '' %>" onclick="commentLike(this)"> <i class="fa fa-heart"></i> <span
+                                                                        class="likeNumb"><%= reply.likes %></span></button>
+                                                            </form>
+                                                        </div>
+                                                        <form class="mb-3 toggleThis replyForm d-none">
+                                                            <input type="text" value="<%= post.id %>" name="postID" hidden>
+                                                            <input type="text" value="<%= comment.id %>" name="commentID" hidden>
+                                                            <input type="text" value="" name="replyTo" hidden>
+                                                            <textarea name="reply"
+                                                                class="form-control form-control-plaintext mb-2 px-2 border border-1"></textarea>
+                                                            <button type="button" onclick="postReply(this)" class="btn bg-norm text-light">Reply</button>
+                                                        </form>
+        
+                                                    </div>
+                                                </div>
+                                                <% })  %>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                        <% }) %>
+
+                    </div>
+                    <% }else{ %>
+                    <h4 style="margin: 5% 0 26.7% 0; text-align: center; width: 100%">No comments yet, be the first</h4>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        <% }else{ %>
+        <h4 style="margin: 5% 0 26.7% 0; text-align: center; width: 100%">No post found under this link</h4>
+        <% } %>
+
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Edit your comment</h5>
+                        <button type="button" class="btn btn-close" data-toggle="modal" data-target="#editModal" data-bs-dismiss="modal" aria-label="Close"> <i class="fa fa-times"></i> </button>
+                    </div>
+    
+                    <div class="modal-body">
+                        <form id="editForm" method="post">
+                            <input type="text" name="type" hidden>
+                            <input type="text" name="commentID" hidden>
+                            <textarea name="comment" placeholder="What's new..." id="comment" class="form-control form-control-plaintext mb-2 px-2"
+                            style="resize: none; border: 1px solid #cccccc63"></textarea>
+                            <button class="btn btn-success" type="button" onclick="editComment(this)">
+                                Confirm</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <div class="d-none" style="width:100%;" id="edditMsg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include('./includes/footer.ejs') %>
+    <script src="/js/main.js"></script>
+
+    <script>
+        const likeForm = document.getElementById('likeForm');
+        const likeCount = document.getElementById('likeCount');
+        const liker = document.getElementById('liker');
+
+        likeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const postId = likeForm.postId.value.trim();
+            try {
+                const res = await fetch('/like', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        postId
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await res.json();
+                if (data.unsigned) {
+                    alert("Please log in");
+                }
+
+                if (data.success) {
+                    if (data.type == 'like') {
+                        const likeNumb = await parseInt(likeCount.textContent.trim()) + 1;
+                        likeCount.textContent = likeNumb;
+                        liker.classList.add('active');
+                    } else {
+                        const likeNumb = await parseInt(likeCount.textContent.trim()) - 1;
+                        likeCount.textContent = likeNumb;
+                        liker.classList.remove('active');
+                    }
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const postId = window.location.pathname.split('/')[2];
+            setTimeout(async () => {
+                try {
+                    const res = await fetch('/post/view', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            postId
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                } catch (err) {
+                    console.log(err);
+                }
+            }, 1000 * 5);
+        });
+    </script>
+</body>
+
+</html>

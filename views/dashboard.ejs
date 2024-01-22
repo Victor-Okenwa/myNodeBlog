@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%- include('./includes/header.ejs') %>
+</head>
+
+<body class="dashboard-page">
+    <%- include('./includes/navbar.ejs') %>
+
+    <main class="my-3">
+        <% if(user && !user.roles.Editor){ %>
+        <form id="editorForm" class="container">
+            <div class="field">
+                <p>Want to post your blogs?</p>
+                <button class="btn">Become an editor</button>
+            </div>
+        </form>
+
+        <div style="height: 59.2vh;"></div>
+        <% }else{ %>
+
+        <div class="container-fluid mt-5">
+            <h4 class="text-uppercase text-center">Your records</h4>
+
+            <div class="card-container row align-items-center justify-content-center" style="gap: 10px; ">
+                <div class="card col-lg-4 col-md-6 col-sm-12 bg-primary text-light">
+                    <div class="card-title text-capitalize">blogs</div>
+                    <div class=" card-divider"></div>
+                    <div class="card-body"><%= records.blogs %></div>
+                </div>
+                <div class="card col-lg-4 col-md-6 col-sm-12 bg-success text-light">
+                    <div class="card-title text-capitalize">views</div>
+                    <div class=" card-divider"></div>
+                    <div class="card-body"><%= records.views %></div>
+                </div>
+                <div class="card col-lg-4 col-md-6 col-sm-12 bg-danger text-light">
+                    <div class="card-title text-capitalize">likes</div>
+                    <div class=" card-divider"></div>
+                    <div class="card-body"><%= records.likes %></div>
+                </div>
+                <div class="card col-lg-4 col-md-6 col-sm-12 bg-norm text-light">
+                    <div class="card-title text-capitalize">comments</div>
+                    <div class=" card-divider"></div>
+                    <div class="card-body"><%= records.comments %></div>
+                </div>
+            </div>
+        </div>
+        <div class="blog-container container-fluid mt-5">
+            <div class="head d-flex justify-content-between">
+                <h2>Blogs</h2>
+            </div>
+            <% if (posts) { %>
+            <div class="blogs container mt-5">
+                <% posts.forEach(post => { %>
+                    <div class="blog">
+                        <div class="floater"></div>
+                        <div class="blog-image">
+                            <img src="/thumbnails/<%= post.thumbnail %>" alt="">
+                        </div>
+                        <div class="blog-content">
+                            <div class="blog-header">
+                                <%= post.title %>
+                                                        </div>
+                            <div class="blog-body">
+                                <%= post.content %>
+                            </div>
+    
+                            <div class="blog-info">
+                                <span><i class="fa fa-comment"></i> <span><%= post.comment %></span></span>
+                                <span><i class="fa fa-heart"></i> <span><%= post.likes %></span> </span>
+                                <span><i class="fa fa-eye"></i> <span><%= post.views %></span> </span>
+                                <span><i class="fa fa-calendar-alt"></i> <span><%= post.postedOn %></span> </span>
+                            </div>
+                            <div class="blog-footer d-flex justify-content-between mt-3">
+                                <a href="/post/<%= post.id %>" class="btn bg-norm text-light">View <i class="fa fa-long-arrow-alt-right"></i>
+                                </a>
+                                <div class="category font-italic"><%= post.category %></div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+            <% }else{ %>
+            <h4 style="margin: 5% 0 26.7% 0; text-align: center; width: 100%">No blogs from you <a href="/post">Create
+                    blog</a> </h4>
+            <% }%>
+        </div>
+        <% }%>
+
+    </main>
+
+    <%- include('./includes/footer.ejs') %>
+    <script src="/js/main.js"></script>
+    <script>
+        const editorForm = document.getElementById('editorForm');
+
+        if (editorForm)
+            editorForm.addEventListener('submit', e => {
+                e.preventDefault();
+                if (confirm('Do you agree to our terms and services?'))
+                    $.ajax({
+                        url: '/addrole',
+                        method: 'POST',
+                        success: (data) => {
+                            console.log(data);
+                            if (data.success) {
+                                alert('You are now an editor!')
+                                editorForm.remove();
+                            }
+                        },
+                        error: (xhr, status, error) => {
+                            console.log(status, error);
+                        }
+                    });
+            })
+    </script>
+</body>
+
+</html>

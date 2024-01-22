@@ -1,0 +1,56 @@
+<nav class="navbar navbar-lg navbar-light navbar2">
+    <div class="first">
+        <button type="button" class="btn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+        <div class="logo">
+            <a href="/"><img src="/images/blogger.png" alt=""></a>
+        </div>
+    </div>
+    <div class="user">
+        <% if(user){ %>
+        <div class="user-profile drop">
+            <button class="user-info btn drop-btn overflow-auto" role="button" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                <div class="user-img"><img
+                        src="<%=( user.profile) ? `/profiles/${user.profile}` : " /images/img1.png" %>" alt="">
+                </div>
+                <!-- <div class="username">
+                    <%= user.username %>
+                </div> -->
+            </button>
+            <div class="drop-menu">
+                <a href="/profile">profile</a>
+                <a href="/dashboard">dashboard</a>
+                <form action="/logout" method="post">
+                    <button onclick="return confirm(`<%=  user.username %> : Do you want to logout?`)">logout</button>
+                </form>
+            </div>
+        </div>
+
+        <% }else{ %>
+        <ul>
+            <li>
+                <a href=" /login" class="text-uppercase btn">login</a>
+            </li>
+            <li>
+                <a href="/signup" class="text-uppercase btn btn-warning">signup</a>
+            </li>
+        </ul>
+        <% } %>
+    </div>
+</nav>
+
+<div class="nav-sidebar">
+    <ul>
+        <li>
+            <a href="/">Home</a>
+        </li>
+        <% if(user && user.roles.Editor){ %>
+        <li>
+            <a href="/post">New post</a>
+        </li>
+        <li>
+            <a href="/post/myblogs">My Blogs</a>
+        </li>
+        <% } %>
+    </ul>
+</div>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%- include('./includes/header.ejs') %>
+</head>
+
+<body class="newpost-page">
+    <%- include('./includes/navbar.ejs') %>
+
+    <main class="container my-5">
+        <form id="postForm" enctype="multipart/form-data">
+            <h3 class="text-center">New Post</h3>
+            <div class="fields">
+                <div>
+                    <label for="title">Title:</label>
+                    <input class="form-control form-control-sm" name="title" id="title">
+                </div>
+                <div class="error title text-danger" style="margin-top: -25px;"></div>
+                <div>
+                    <label for="category">Category:</label>
+                    <select name="category" id="category" class="form-control form-control-sm"
+                        onfocus="addOptions(this)">
+                        <option disabled selected>Select a category</option>
+                    </select>
+                    <div class="error category text-danger"></div>
+                </div>
+                <div>
+                    <label for="thumbnail">Thumbnail:</label>
+                    <input accept="image/*" class="form-control form-control-file" type="file" name="thumbnail"
+                        id="thumbnail">
+                    <div class="error thumbnail text-danger"></div>
+                </div>
+
+                <div>
+                    <label for="content">Content:</label>
+                    <textarea class="form-control form-control-sm" name="content" id="content"></textarea>
+                    <div class="error content text-danger"></div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button class="btn bg-norm text-light">Upload</button>
+                <div class="success upload text-success font-weight-bold mt-1"></div>
+            </div>
+        </form>
+    </main>
+
+    <%- include('./includes/footer.ejs') %>
+    <script src="/js/main.js"></script>
+    <script>
+        const postForm = document.getElementById('postForm');
+        const titleError = document.querySelector('.title.error');
+        const categoryError = document.querySelector('.category.error');
+        const thumbnailError = document.querySelector('.thumbnail.error');
+        const contentError = document.querySelector('.content.error');
+        const uploadSuccess = document.querySelector('.upload.success');
+
+        postForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const title = postForm.title.value.trim();
+            if (!title) {
+                return titleError.textContent = 'Field is required';
+            }
+
+            const category = postForm.category.value;
+            if (!category) {
+                return categoryError.textContent = 'Please selecte an option';
+            }
+
+            const content = postForm.content.value;
+            if (!content) {
+                return contentError.textContent = 'Field is required';
+            }
+
+            const thumbnail = postForm.thumbnail.files[0];
+            if (!thumbnail) {
+                return thumbnailError.textContent = 'No file selected';
+            }
+            if (!thumbnail.type.startsWith('image')) {
+                return thumbnailError.textContent = 'File is not valid';
+            }
+
+            if (thumbnail.size >= 2000000) {
+                return thumbnailError.textContent = 'File is too large';
+            }
+
+            titleError.textContent = "";
+            categoryError.textContent = "";
+            thumbnailError.textContent = "";
+            contentError.textContent = "";
+
+            const formData = new FormData($("#postForm")[0]);
+            $.ajax({
+                url: '/post',
+                method: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: (data) => {
+                    console.log(data);
+                    if (data.success) {
+                        uploadSuccess.textContent = "Post has been uploaded";
+                    }
+                },
+                error: (xhr, status, error) => {
+                    console.log(status, error);
+                }
+            });
+        })
+    </script>
+</body>
+
+</html>

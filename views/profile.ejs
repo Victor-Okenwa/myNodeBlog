@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%- include('./includes/header.ejs') %>
+</head>
+
+<body class="profile-page">
+    <%- include('./includes/navbar.ejs') %>
+    <% if(user){ %>
+    <div class="user-details container">
+        <div class="user-profile">
+            <img src="/profiles/<%= user.profile %>" alt="">
+            <!-- action="/profile" method="POST" enctype="multipart/form-data" -->
+            <form id="profileForm" enctype="multipart/form-data">
+                <input type="file" accept="image/*" id="profile" name="profile">
+                <div class="profile error text-danger mb-4"></div>
+                <button class="btn btn-block btn-primary"><i class="fa fa-upload"></i></button>
+                <div class="profile successfull text-success font-weight-bold text-center"></div>
+            </form>
+        </div>
+
+        <form id="detailForm" class="user-info">
+            <h3>Update your details</h3>
+            <div class="username mt-2">
+                <label for="username">Username:</label>
+                <input type="text" class="form-control" name="username" id="username" value="<%= user.username %>">
+                <div class="username error text-danger"></div>
+            </div>
+            <div class="email mt-2">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" name="email" id="email" value="<%= user.email %>">
+                <div class="email error text-danger"></div>
+            </div>
+
+            <button class="btn btn-dark mt-2">Update</button>
+            <div class="details successfull text-success font-weight-bold"></div>
+        </form>
+    </div>
+
+    <% }else{ %>
+    <h3>Your profile is not found, maybe you are not logged in.</h3>
+    <% } %>
+    <%- include('./includes/footer.ejs') %>
+    <script src="/js/main.js"></script>
+    <script>
+        const profileForm = document.getElementById('profileForm');
+        const profileError = document.querySelector('.profile.error');
+        const profileSuccess = document.querySelector('.profile.successfull');
+
+        const detailForm = document.getElementById('detailForm');
+        const usernameError = document.querySelector('.username.error');
+        const emailError = document.querySelector('.email.error');
+        const detailSuccess = document.querySelector('.details.successfull');
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const profile = profileForm.profile.files[0];
+            profileError.textContent = '';
+            console.log(profile);
+            if (!profile) {
+                return profileError.textContent = 'No file selected';
+            }
+            if (!profile.type.startsWith('image')) {
+                return profileError.textContent = 'File is not valid';
+            }
+
+            if (profile.size >= 2000000) {
+                return profileError.textContent = 'File is too large';
+            }
+
+            const formData = new FormData();
+            formData.append('profile', profile);
+
+            $.ajax({
+                url: '/profile',
+                method: 'POST',
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                data: formData,
+                success: (data) => {
+                    if (data.errors) {
+                        profileError.textContent = data.errors.error;
+                    }
+
+                    if(data.success){
+                        profileSuccess.innerHTML =
+                    `<i class="fa fa-check-circle"></i> Update sucessfull`;
+                    }
+                },
+                error: (xhr, status, thrown) => {
+                    console.log({
+                        xhr,
+                        status,
+                        thrown
+                    })
+                }
+            });
+
+
+            /*   try {
+                                       const res = await fetch('/profile', {
+                                           method: 'POST',
+                                           body: JSON.stringify({profile}),
+                                           headers: {
+                                               'Content-Type': 'application/json'
+                                           }
+                                       });
+                                       const data = await res.json();
+                                       console.log(data);
+                                       if (data.errors) {
+                                           profileError.textContent = data.errors.profile
+                                       }
+                       
+                                   } catch (err) {
+                                       console.log(err);
+                                   }*/
+        });
+
+        detailForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = detailForm.username.value.trim();
+            const email = detailForm.email.value.trim();
+
+            usernameError.textContent = '';
+            emailError.textContent = '';
+            detailSuccess.innerHTML = '';
+            try {
+                const res = await fetch('/profile', {
+                    method: "PUT",
+                    body: JSON.stringify({
+                        username,
+                        email
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await res.json();
+                if (data.errors) {
+                    usernameError.textContent = data.errors.username
+                    emailError.textContent = data.errors.email;
+                }
+                if (data.user) detailSuccess.innerHTML =
+                    `<i class="fa fa-check-circle"></i> Update sucessfull`;
+
+            } catch (err) {
+                console.log(err);
+            }
+        })
+    </script>
+</body>
+
+</html>

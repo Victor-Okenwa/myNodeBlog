@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%- include('./includes/header.ejs') %>
+</head>
+
+<body class="myblog-page">
+    <%- include('./includes/navbar.ejs') %>
+        <main class="my-3">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Your blogs</h3>
+                </div>
+                <div class="card-body overflow-auto">
+                    <% if (posts) { %>
+                        <table class=" table table-bordered table-striped table-hover" style="width: 100vw !important;">
+                            <thead class="bg-secondary text-light">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Thumbnail</th>
+                                    <th>Comments</th>
+                                    <th>Likes</th>
+                                    <th>Views</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% posts.forEach(post=> { %>
+                                    <tr>
+                                        <td>
+                                            <%= post.title %>
+                                        </td>
+                                        <td>
+                                            <%= post.category %>
+                                        </td>
+                                        <td>
+                                            <img id="img" src="/thumbnails/<%= post.thumbnail  %>" width="100px"
+                                                height="100px" class="rounded-pill">
+                                        </td>
+
+                                        <td>
+                                            <%= post.comments %>
+                                        </td>
+                                        <td>
+                                            <%= post.likes %>
+                                        </td>
+                                        <td>
+                                            <%= post.views %>
+                                        </td>
+                                        <td>
+                                            <a href="/post/edit/<%= post.id  %>" class="btn btn-primary">Edit</a>
+                                        </td>
+                                        <td>
+                                            <form>
+                                                <input type="text" name="postId" hidden value="<%= post.id  %>">
+                                                <button type="button" class="btn btn-danger text-uppercase" onclick="deletePost(this)">
+                                                    delete
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                        <% }else{ %>
+                            <h4 style="margin: 5% 0 26.7% 0; text-align: center; width: 100%">No blogs from you <a
+                                    href="/post">Create
+                                    blog</a> </h4>
+                            <% }%>
+                </div>
+            </div>
+        </main>
+
+        <%- include('./includes/footer.ejs') %>
+            <script src="/js/main.js"></script>
+</body>

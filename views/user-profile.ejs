@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%- include('./includes/header.ejs') %>
+</head>
+
+<body class="index-page">
+    <%- include('./includes/navbar.ejs') %>
+    <main>
+        <% if(user){ %>
+
+        <div class="blog-container card mb-5">
+            <div class="card-header d-block mx-auto" style="width: 70% !important; height:60% !important">
+                <div class="card-img" style="width: 100% !important; height:80%"><img src="/profiles/<%= user.profile %>"
+                        class="rounded-sm d-block mx-auto" height="250" width="80%" alt=""></div>
+                <div class="card-username text-uppercase fa-2x text-center"><%= user.username %></div>
+            </div>
+
+            <div class="card-body">
+                <h2 class="text-center my-5">Blog posts</h2>
+                <% if (posts) { %> 
+                <div class="blogs container">
+                    <% posts.forEach(post => { %>
+                    <div class="blog">
+                        <div class="floater"></div>
+
+                        <div class="blog-image">
+                            <img src="/thumbnails/<%= post.thumbnail %>" alt="">
+                        </div>
+                        <div class="blog-content">
+                            <div class="blog-header">
+                                <%= post.title %>
+                            </div>
+                            <div class="blog-body">
+                                <%= post.content %>
+                            </div>
+
+                            <div class="blog-info">
+                                <span><i class="fa fa-user"></i> <span><%= post.poster %></span> </span>
+                                <span><i class="fa fa-heart"></i> <span><%= post.likes %></span> </span>
+                                <span><i class="fa fa-eye"></i> <span><%= post.views %></span> </span>
+                                <span><i class="fa fa-calendar-alt"></i> <span><%= post.postedOn %></span> </span>
+                            </div>
+                            <div class="blog-btn"><a href="post/<%= post.id %>" class="btn bg-norm text-light">Read more
+                                    <i class="fa fa-long-arrow-alt-right"></i></a></div>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+                <% }else{ %>
+                <h3>No post by this user.</h3>
+                <% } %>
+
+            </div>
+        </div>
+
+
+        <% }else{ %>
+        <h3>Profile not found.</h3>
+        <% } %>
+    </main>
+    <%- include('./includes/footer.ejs') %>
+    <script src="/js/main.js"></script>
+</body>
+
+</html>
