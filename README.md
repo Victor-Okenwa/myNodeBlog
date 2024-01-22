@@ -1,13 +1,17 @@
 
-Node.js Blog with Express, Multer, and EJS
-This is a simple blog built with Node.js using the Express framework, Multer for handling file uploads, and EJS as the templating engine.
+MongoDB, Node.js Blog with Express, Multer, Bootstrap and EJS
+This is a simple blog built with Node.js using the Express framework, Multer for handling file uploads, Bootstrap for quick styling and EJS as the templating engine.
 
 Features
+MongoDB: A source-available, cross-platform, document-oriented database program. Classified as a NoSQL database product, MongoDB utilizes JSON-like documents with optional schemas. MongoDB is developed by MongoDB Inc. and current versions are licensed under the Server Side Public License.
+
 Express.js: A minimal and flexible Node.js web application framework that provides a robust set of features to develop web and mobile applications.
 
 Multer: Middleware for handling multipart/form-data, primarily used for uploading files. In this blog, Multer is employed to handle image uploads for blog posts.
 
 EJS (Embedded JavaScript): A simple templating engine that lets you generate HTML markup with plain JavaScript. It allows dynamic content rendering on the server side.
+
+Bootstrap: Bootstrap is a free and open-source CSS framework directed at responsive, mobile-first front-end web development. It contains HTML, CSS and JavaScript-based design templates for typography, forms, buttons, navigation, and other interface components.
 
 Installation
 Clone this repository:
@@ -30,7 +34,11 @@ Create a .env file in the root directory and set the following variables:
 env
 Copy code
 PORT=5000
+DATABASE_URI=mongodb://localhost:27017/blog
+JWT_TOKEN=whatever you prefer
+
 Update the PORT variable with the desired port number.
+The DATABASE_URI is a local mongodb compass URI you can change to your desired URI
 
 Usage
 Start the server:
